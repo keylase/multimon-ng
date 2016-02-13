@@ -136,7 +136,7 @@ static void dtmf_demod(struct demod_state *s, buffer_t buffer, int length, unsig
 			s->l1.dtmf.blkcount = BLOCKLEN;
 			i = process_block(s);
 			if (i != s->l1.dtmf.lastch && i >= 0)
-				verbprintf(0, "TIME: %f, DTMF: %c, %d\n", (cur_pos/44100.0f), dtmf_transl[i], length);
+				verbprintf(0, "TIME: %f, DTMF: %c\n", (cur_pos/44100.0f), dtmf_transl[i]);
 			s->l1.dtmf.lastch = i;
 		}
 	}
