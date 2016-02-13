@@ -120,13 +120,13 @@ void _verbprintf(int verb_level, const char *fmt, ...)
 
 /* ---------------------------------------------------------------------- */
 
-void process_buffer(float *float_buf, short *short_buf, unsigned int len)
+void process_buffer(float *float_buf, short *short_buf, unsigned int len, unsigned long cur_pos)
 {
     for (int i = 0; (unsigned int) i <  NUMDEMOD; i++)
         if (MASK_ISSET(i) && dem[i]->demod)
         {
             buffer_t buffer = {short_buf, float_buf};
-            dem[i]->demod(dem_st+i, buffer, len);
+            dem[i]->demod(dem_st+i, buffer, len, cur_pos);
         }
 }
 
@@ -271,7 +271,7 @@ static void input_sound(unsigned int sample_rate, unsigned int overlap,
                     fprintf(stderr, "warning: noninteger number of samples read\n");
             }
             if (fbuf_cnt > overlap) {
-                process_buffer(fbuf, buffer, fbuf_cnt-overlap);
+                process_buffer(fbuf, buffer, fbuf_cnt-overlap,0);
                 memmove(fbuf, fbuf+fbuf_cnt-overlap, overlap*sizeof(fbuf[0]));
                 fbuf_cnt = overlap;
             }
@@ -483,8 +483,11 @@ static void input_file(unsigned int sample_rate, unsigned int overlap,
     /*
      * demodulate
      */
+    unsigned long buf_cur_pos;
     for (;;) {
         i = read(fd, sp = buffer, sizeof(buffer));
+	buf_cur_pos += i;
+	//fprintf(stderr,"i:%d, fbuf_cnt: %d, buf_cur_pos: %d, time: %f \n", i, sizeof(buffer[0]), buf_cur_pos, ( buf_cur_pos / 44100.0f));
         if (i < 0 && errno != EAGAIN) {
             perror("read");
             exit(4);
@@ -504,7 +507,7 @@ static void input_file(unsigned int sample_rate, unsigned int overlap,
                     fprintf(stderr, "warning: noninteger number of samples read\n");
             }
             if (fbuf_cnt > overlap) {
-                process_buffer(fbuf, buffer, fbuf_cnt-overlap);
+                process_buffer(fbuf, buffer, fbuf_cnt-overlap, buf_cur_pos);
                 memmove(fbuf, fbuf+fbuf_cnt-overlap, overlap*sizeof(fbuf[0]));
                 fbuf_cnt = overlap;
             }

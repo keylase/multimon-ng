@@ -119,7 +119,7 @@ static inline int process_block(struct demod_state *s)
 
 /* ---------------------------------------------------------------------- */
 
-static void dtmf_demod(struct demod_state *s, buffer_t buffer, int length)
+static void dtmf_demod(struct demod_state *s, buffer_t buffer, int length, unsigned long cur_pos)
 {
 	float s_in;
 	int i;
@@ -136,7 +136,7 @@ static void dtmf_demod(struct demod_state *s, buffer_t buffer, int length)
 			s->l1.dtmf.blkcount = BLOCKLEN;
 			i = process_block(s);
 			if (i != s->l1.dtmf.lastch && i >= 0)
-				verbprintf(0, "DTMF: %c\n", dtmf_transl[i]);
+				verbprintf(0, "TIME: %f, DTMF: %c, %d\n", (cur_pos/44100.0f), dtmf_transl[i], length);
 			s->l1.dtmf.lastch = i;
 		}
 	}

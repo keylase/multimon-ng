@@ -266,7 +266,7 @@ struct demod_param {
     unsigned int samplerate;
     unsigned int overlap;
     void (*init)(struct demod_state *s);
-    void (*demod)(struct demod_state *s, buffer_t buffer, int length);
+    void (*demod)(struct demod_state *s, buffer_t buffer, int length, unsigned long cur_pos);
     void (*deinit)(struct demod_state *s);
 };
 
